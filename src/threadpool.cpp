@@ -8,11 +8,18 @@ ThreadPool::ThreadPool(int count): stop{false}{
 }
 
 void ThreadPool::workerLoop(){
-    while(!stop) {}
+    std::unique_lock<std::mutex> lck(mtx);
+     cv.wait(lck, [this] {
+         return (stop == true);
+     });
 }
 
 ThreadPool::~ThreadPool(){
-    stop = true;
+    {
+        std::unique_lock<std::mutex> lck(mtx);
+        stop = true;
+    }
+    cv.notify_all();
     for(auto &thr : threadsVec){
         if(thr.joinable()) thr.join();
     }
