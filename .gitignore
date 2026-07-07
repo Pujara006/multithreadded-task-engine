@@ -1,0 +1,5 @@
+build/
+test_thread_pool
+.DS_Store
+*.o
+*.out
